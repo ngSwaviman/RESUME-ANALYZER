@@ -99,9 +99,11 @@ app.use(notFound);
 app.use(errorHandler);
 
 const start = async () => {
-  if (!process.env.JWT_SECRET) {
-    const message =
-      'JWT_SECRET is not set. Add it in Render → Environment (any long random string) or in server/.env locally.';
+  const REQUIRED_ENV = ['MONGO_URI', 'JWT_SECRET'];
+  const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
+
+  if (missingEnv.length) {
+    const message = `Missing environment variable(s): ${missingEnv.join(', ')}. Add them in Render → this service → Environment, then Save Changes (a redeploy starts automatically).`;
     if (process.env.NODE_ENV === 'production') {
       // eslint-disable-next-line no-console
       console.error(`[fatal] ${message}`);
