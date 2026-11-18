@@ -100,8 +100,15 @@ app.use(errorHandler);
 
 const start = async () => {
   if (!process.env.JWT_SECRET) {
+    const message =
+      'JWT_SECRET is not set. Add it in Render → Environment (any long random string) or in server/.env locally.';
+    if (process.env.NODE_ENV === 'production') {
+      // eslint-disable-next-line no-console
+      console.error(`[fatal] ${message}`);
+      process.exit(1);
+    }
     // eslint-disable-next-line no-console
-    console.warn('[warn] JWT_SECRET is not set. Add it to server/.env before using the app.');
+    console.warn(`[warn] ${message}`);
   }
   await connectDB();
 
