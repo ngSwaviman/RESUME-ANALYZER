@@ -32,3 +32,6 @@ data-export/
 
 # local verification screenshots
 /*.png
+
+# Render API key used by scripts/render-deploy.mjs
+.render-api-key
