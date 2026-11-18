@@ -1,0 +1,44 @@
+{
+  "name": "resume-analyzer-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Resume Screening & Job Matching System - Express + MongoDB API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed.js",
+    "reset:data": "node scripts/resetData.js",
+    "export:data": "node scripts/exportData.js",
+    "demo": "node scripts/demoServer.js",
+    "check:nlp": "node scripts/nlpCheck.js",
+    "check:api": "node scripts/apiCheck.js"
+  },
+  "keywords": [
+    "mern",
+    "resume",
+    "tf-idf",
+    "cosine-similarity",
+    "recruitment"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.1",
+    "pdfjs-dist": "^6.5.438"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.3.0",
+    "nodemon": "^3.1.9",
+    "pdfkit": "^0.20.2"
+  }
+}

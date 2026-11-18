@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 font-sans text-slate-700;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-slate-900;
+  }
+
+  ::selection {
+    background-color: rgba(94, 234, 212, 0.35);
+    color: #050b16;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-700 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 transition-all duration-200 hover:bg-brand-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-60;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-100 disabled:opacity-60;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+
+  /* Auth screens: one confident call to action, violet on the marketing palette */
+  .btn-auth {
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold text-white transition-all duration-300;
+    background-image: linear-gradient(100deg, #7c3aed 0%, #6366f1 52%, #0ea5e9 100%);
+    box-shadow: 0 18px 40px -18px rgba(109, 40, 217, 0.85);
+  }
+
+  .btn-auth:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 50px -18px rgba(109, 40, 217, 1);
+  }
+
+  .btn-auth:active:not(:disabled) {
+    transform: translateY(0) scale(0.99);
+  }
+
+  .btn-auth:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+  }
+
+  .table-wrap {
+    @apply overflow-x-auto rounded-2xl border border-slate-200 bg-white;
+  }
+
+  .th {
+    @apply whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  .td {
+    @apply px-4 py-3 align-middle text-sm text-slate-700;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 transition-all duration-150 hover:bg-brand-50 hover:text-brand-700;
+  }
+
+  .sidebar-link-active {
+    @apply bg-brand-600 text-white shadow-sm hover:bg-brand-600 hover:text-white;
+  }
+}
+
+@layer utilities {
+  .grid-glow {
+    background-image: radial-gradient(circle at 20% 20%, rgba(59, 108, 246, 0.18), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(36, 83, 230, 0.12), transparent 40%);
+  }
+
+  /* Marketing (dark) surface helpers */
+  .night-grid {
+    background-image: linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+
+  .night-aurora {
+    background-image: radial-gradient(circle at 15% 0%, rgba(94, 234, 212, 0.16), transparent 42%),
+      radial-gradient(circle at 85% 10%, rgba(56, 189, 248, 0.12), transparent 45%),
+      radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.08), transparent 55%);
+  }
+
+  .night-hairline {
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  .text-glow-mint {
+    text-shadow: 0 0 42px rgba(94, 234, 212, 0.35);
+  }
+
+  /* Marketing surface — deep indigo / violet */
+  .tile-grid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='132'%3E%3Crect x='9' y='9' width='150' height='114' rx='22' fill='none' stroke='%238b5cf6' stroke-opacity='0.22'/%3E%3C/svg%3E");
+    background-size: 168px 132px;
+    background-position: center top;
+    -webkit-mask-image: radial-gradient(ellipse 90% 78% at 50% 0%, #000 18%, transparent 82%);
+    mask-image: radial-gradient(ellipse 90% 78% at 50% 0%, #000 18%, transparent 82%);
+  }
+
+  .hero-aurora {
+    background-image: radial-gradient(circle at 50% -18%, rgba(109, 40, 217, 0.55), transparent 58%),
+      radial-gradient(circle at 6% 82%, rgba(79, 70, 229, 0.38), transparent 46%),
+      radial-gradient(circle at 95% 86%, rgba(56, 189, 248, 0.22), transparent 46%);
+  }
+
+  .text-gradient {
+    background-image: linear-gradient(100deg, #ede9fe 0%, #c4b5fd 34%, #a5b4fc 64%, #7dd3fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hairline-top {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  @keyframes authIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Each form row eases in slightly after the one above it. */
+  .auth-form > * {
+    animation: authIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Violet focus ring on the auth screens, matching the submit button. */
+  .auth-form .input:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.16);
+  }
+
+  .auth-form > *:nth-child(1) { animation-delay: 0.02s; }
+  .auth-form > *:nth-child(2) { animation-delay: 0.06s; }
+  .auth-form > *:nth-child(3) { animation-delay: 0.1s; }
+  .auth-form > *:nth-child(4) { animation-delay: 0.14s; }
+  .auth-form > *:nth-child(5) { animation-delay: 0.18s; }
+  .auth-form > *:nth-child(6) { animation-delay: 0.22s; }
+  .auth-form > *:nth-child(7) { animation-delay: 0.26s; }
+  .auth-form > *:nth-child(8) { animation-delay: 0.3s; }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Mobile browsers zoom the page when a focused field is under 16px. */
+@media (max-width: 640px) {
+  .input,
+  select.input,
+  textarea.input {
+    font-size: 16px;
+  }
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .auth-form > * {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,15 @@
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import Loader from './Loader';
+import { homeFor } from '../utils/roles';
+
+export default function ProtectedRoute({ roles }) {
+  const { user, initializing } = useAuth();
+  const location = useLocation();
+
+  if (initializing) return <Loader fullscreen label="Restoring your session..." />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (roles && !roles.includes(user.role)) return <Navigate to={homeFor(user.role)} replace />;
+
+  return <Outlet />;
+}
