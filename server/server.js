@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
 const connectDB = require('./config/db');
+const { ensureAdminUser } = require('./services/adminBootstrap');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
@@ -113,6 +114,15 @@ const start = async () => {
     console.warn(`[warn] ${message}`);
   }
   await connectDB();
+
+  // A deployment never runs `npm run seed`, so the admin account has to be
+  // ensured here or the seeded login works on localhost but not in production.
+  try {
+    await ensureAdminUser();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[bootstrap] Could not ensure the administrator account:', error.message);
+  }
 
   const server = app.listen(PORT, () => {
     // eslint-disable-next-line no-console
