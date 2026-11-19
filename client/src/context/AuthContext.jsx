@@ -43,7 +43,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = useCallback(async (payload) => {
     const data = await registerRequest(payload);
-    persistSession(data);
+    // Recruiter sign-ups return no token: the account is pending admin approval.
+    if (data.token) persistSession(data);
     return data;
   }, []);
 

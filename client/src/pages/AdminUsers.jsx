@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { CheckCircle2, Search, ShieldCheck, UserRound, Users, UserX } from 'lucide-react';
+import { CheckCircle2, Clock, Search, ShieldCheck, UserRound, Users, UserX, XCircle } from 'lucide-react';
 import PageHeader from '../components/PageHeader.jsx';
 import Loader from '../components/Loader.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import StatCard from '../components/StatCard.jsx';
-import { listUsersRequest, toggleUserStatusRequest } from '../services/adminService.js';
+import {
+  listUsersRequest,
+  setRecruiterApprovalRequest,
+  toggleUserStatusRequest,
+} from '../services/adminService.js';
 import { getErrorMessage } from '../services/api.js';
 import { formatDate } from '../utils/format.js';
 
@@ -73,11 +77,33 @@ export default function AdminUsers() {
     }
   };
 
+  const handleApproval = async (user, status) => {
+    setBusyId(user.id);
+    setToggleError('');
+    setNotice('');
+    try {
+      const data = await setRecruiterApprovalRequest(user.id, status);
+      setNotice(data.message);
+      setState((prev) => ({
+        ...prev,
+        users: prev.users.map((row) =>
+          row.id === user.id ? { ...row, approvalStatus: data.user.approvalStatus } : row
+        ),
+      }));
+    } catch (error) {
+      setToggleError(getErrorMessage(error));
+    } finally {
+      setBusyId('');
+    }
+  };
+
   const { users } = state;
   const counts = {
     candidates: users.filter((user) => user.role === 'candidate').length,
     recruiters: users.filter((user) => user.role === 'recruiter').length,
     admins: users.filter((user) => user.role === 'admin').length,
+    pendingRecruiters: users.filter((user) => user.role === 'recruiter' && user.approvalStatus === 'pending')
+      .length,
   };
 
   return (
@@ -85,13 +111,20 @@ export default function AdminUsers() {
       <PageHeader
         eyebrow="Administrator"
         title="All accounts"
-        subtitle="Every candidate, recruiter and administrator on the platform. Search, filter and deactivate accounts."
+        subtitle="Every candidate, recruiter and administrator on the platform. Approve new recruiters, search, filter and deactivate accounts."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={UserRound} label="Candidates" value={counts.candidates} hint="In the current result" tone="brand" />
         <StatCard icon={Users} label="Recruiters" value={counts.recruiters} hint="In the current result" tone="indigo" />
         <StatCard icon={ShieldCheck} label="Administrators" value={counts.admins} hint="In the current result" tone="emerald" />
+        <StatCard
+          icon={Clock}
+          label="Pending recruiters"
+          value={counts.pendingRecruiters}
+          hint="Waiting for your approval"
+          tone="amber"
+        />
       </div>
 
       <div className="card p-4">
@@ -188,6 +221,12 @@ export default function AdminUsers() {
                 <span className="text-xs text-slate-500">{formatDate(user.createdAt)}</span>
 
                 <div className="flex items-center gap-2 sm:justify-end">
+                  {user.role === 'recruiter' && user.approvalStatus === 'pending' && (
+                    <span className="chip bg-amber-50 text-amber-700">Pending approval</span>
+                  )}
+                  {user.role === 'recruiter' && user.approvalStatus === 'rejected' && (
+                    <span className="chip bg-rose-50 text-rose-600">Not approved</span>
+                  )}
                   <span
                     className={`chip ${
                       user.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600'
@@ -195,6 +234,29 @@ export default function AdminUsers() {
                   >
                     {user.isActive ? 'Active' : 'Disabled'}
                   </span>
+                  {user.role === 'recruiter' && user.approvalStatus !== 'approved' && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleApproval(user, 'approved')}
+                        disabled={busyId === user.id}
+                        className="btn-primary text-xs"
+                      >
+                        <CheckCircle2 size={14} />
+                        {busyId === user.id ? 'Saving...' : 'Approve'}
+                      </button>
+                      {user.approvalStatus === 'pending' && (
+                        <button
+                          type="button"
+                          onClick={() => handleApproval(user, 'rejected')}
+                          disabled={busyId === user.id}
+                          className="btn-ghost text-xs"
+                        >
+                          <XCircle size={14} /> Reject
+                        </button>
+                      )}
+                    </>
+                  )}
                   {user.role !== 'admin' && (
                     <button
                       type="button"

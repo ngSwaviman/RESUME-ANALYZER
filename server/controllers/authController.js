@@ -51,7 +51,16 @@ const register = asyncHandler(async (req, res) => {
     throw ApiError.badRequest('Company name is required for recruiter accounts.');
   }
 
-  const user = await User.create({ name, email, password, role, phone });
+  // Recruiter accounts are created in a pending state: an administrator has to
+  // approve them before they can sign in. Candidates are usable immediately.
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role,
+    phone,
+    approvalStatus: role === 'recruiter' ? 'pending' : 'approved',
+  });
 
   try {
     if (role === 'recruiter') {
@@ -73,6 +82,18 @@ const register = asyncHandler(async (req, res) => {
   }
 
   const profile = await findProfile(user);
+
+  if (role === 'recruiter') {
+    return res.status(201).json({
+      success: true,
+      pendingApproval: true,
+      message:
+        'Recruiter account created. An administrator must approve it before you can sign in — you will be able to log in once it is approved.',
+      user: user.toSafeObject(),
+      profile,
+    });
+  }
+
   const token = signToken(user);
 
   res.status(201).json({
@@ -91,6 +112,14 @@ const login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
   if (!user || !(await user.comparePassword(password))) {
     throw ApiError.unauthorized('Invalid email or password.');
+  }
+  if (user.approvalStatus === 'pending') {
+    throw ApiError.forbidden(
+      'Your recruiter account is waiting for administrator approval. Please try again once it has been approved.'
+    );
+  }
+  if (user.approvalStatus === 'rejected') {
+    throw ApiError.forbidden('Your recruiter account was not approved. Contact the administrator.');
   }
   if (!user.isActive) throw ApiError.forbidden('This account has been deactivated. Contact the administrator.');
 

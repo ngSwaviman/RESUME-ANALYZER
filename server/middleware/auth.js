@@ -29,6 +29,12 @@ const protect = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(decoded.id);
   if (!user) throw ApiError.unauthorized('Account no longer exists.');
+  if (user.approvalStatus === 'pending') {
+    throw ApiError.forbidden('This account is waiting for administrator approval.');
+  }
+  if (user.approvalStatus === 'rejected') {
+    throw ApiError.forbidden('This account was not approved by the administrator.');
+  }
   if (!user.isActive) throw ApiError.forbidden('This account has been deactivated.');
 
   req.user = user;

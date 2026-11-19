@@ -31,6 +31,13 @@ const userSchema = new mongoose.Schema(
       default: 'candidate',
     },
     phone: { type: String, trim: true, default: '' },
+    // Recruiter sign-ups start as 'pending' and cannot log in until an
+    // administrator approves them. Candidates and admins are 'approved'.
+    approvalStatus: {
+      type: String,
+      enum: { values: ['pending', 'approved', 'rejected'], message: '{VALUE} is not a valid approval status' },
+      default: 'approved',
+    },
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
   },
@@ -57,6 +64,7 @@ userSchema.methods.toSafeObject = function toSafeObject() {
     email: this.email,
     role: this.role,
     phone: this.phone,
+    approvalStatus: this.approvalStatus,
     isActive: this.isActive,
     createdAt: this.createdAt,
     lastLoginAt: this.lastLoginAt,

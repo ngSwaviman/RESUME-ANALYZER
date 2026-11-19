@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, Building2 } from 'lucide-react';
+import { AlertCircle, Building2, Clock, ShieldCheck } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 import { getErrorMessage } from '../services/api.js';
@@ -20,6 +20,7 @@ export default function RecruiterRegister() {
   const [form, setForm] = useState(INITIAL);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState('');
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -30,7 +31,13 @@ export default function RecruiterRegister() {
     setError('');
     setSubmitting(true);
     try {
-      await register({ ...form, role: 'recruiter' });
+      const data = await register({ ...form, role: 'recruiter' });
+      // A new recruiter account is pending until an administrator approves it,
+      // so there is no session to open yet.
+      if (data?.pendingApproval) {
+        setPendingMessage(data.message);
+        return;
+      }
       navigate('/recruiter/dashboard', { replace: true });
     } catch (err) {
       setError(getErrorMessage(err));
@@ -39,10 +46,51 @@ export default function RecruiterRegister() {
     }
   };
 
+  if (pendingMessage) {
+    return (
+      <AuthLayout
+        title="Account created"
+        subtitle="One more step before you can sign in."
+        bullets={[
+          'An administrator reviews every new recruiter account',
+          'You will be able to log in as soon as it is approved',
+          'Candidates can register and start immediately',
+        ]}
+        footer={
+          <>
+            Already approved?{' '}
+            <Link to="/login" className="font-semibold text-iris-600 hover:underline">Sign in</Link>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <Clock size={18} className="mt-0.5 shrink-0" />
+            <div className="space-y-1">
+              <p className="font-semibold">Waiting for administrator approval</p>
+              <p>{pendingMessage}</p>
+            </div>
+          </div>
+          <ul className="space-y-2 text-sm text-slate-600">
+            {['Your company details were saved with the account.', 'Your login will work once approved.'].map((item) => (
+              <li key={item} className="flex items-start gap-2">
+                <ShieldCheck size={16} className="mt-0.5 shrink-0 text-emerald-600" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <Link to="/login" className="btn-auth">
+            Go to sign in
+          </Link>
+        </div>
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout
       title="Create a recruiter account"
-      subtitle="Publish openings and rank applicants by measured skill overlap."
+              subtitle="Publish openings and rank applicants by measured skill overlap. Every new recruiter account is reviewed by an administrator before it can sign in."
       bullets={[
         'Job postings with required skills, experience and education',
         'Ranked candidates with matched and missing skills per role',

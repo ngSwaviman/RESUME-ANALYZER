@@ -152,6 +152,28 @@ const listUsers = asyncHandler(async (req, res) => {
   res.json({ success: true, count: users.length, users: users.map((user) => user.toSafeObject()) });
 });
 
+/** PATCH /api/admin/users/:id/approval */
+const setRecruiterApproval = asyncHandler(async (req, res) => {
+  const status = String(req.body.status || '').toLowerCase();
+  if (!['approved', 'rejected', 'pending'].includes(status)) {
+    throw ApiError.badRequest('status must be "approved", "rejected" or "pending".');
+  }
+
+  const user = await User.findById(req.params.id);
+  if (!user) throw ApiError.notFound('User not found.');
+  if (user.role !== 'recruiter') throw ApiError.badRequest('Only recruiter accounts need approval.');
+
+  user.approvalStatus = status;
+  await user.save({ validateBeforeSave: false });
+
+  const labels = { approved: 'approved', rejected: 'rejected', pending: 'put back to pending' };
+  res.json({
+    success: true,
+    message: `${user.name} is now ${labels[status]}.`,
+    user: user.toSafeObject(),
+  });
+});
+
 /** PATCH /api/admin/users/:id/status */
 const toggleUserStatus = asyncHandler(async (req, res) => {
   if (String(req.params.id) === String(req.user._id)) {
@@ -172,4 +194,4 @@ const toggleUserStatus = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getDashboardStats, listUsers, toggleUserStatus };
+module.exports = { getDashboardStats, listUsers, toggleUserStatus, setRecruiterApproval };
